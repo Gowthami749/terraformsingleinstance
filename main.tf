@@ -6,7 +6,7 @@ provider "aws" {
 }
 
 terraform {
-  required_version = "<= 0.14" #Forcing which version of Terraform needs to be used
+  required_version = ">= 0.14" #Forcing which version of Terraform needs to be used
   required_providers {
     aws = {
       version = "<= 3.0.0" #Forcing which version of plugin needs to be used.
@@ -15,25 +15,25 @@ terraform {
   }
 }
 
-resource "aws_vpc" "default" {
+resource "aws_vpc" "terravpc" {
     cidr_block = "${var.vpc_cidr}"
     enable_dns_hostnames = true
     tags = {
         Name = "${var.vpc_name}"
-	Owner = "Sreeharsha Veerapalli"
+	Owner = "Gowthami"
 	environment = "${var.environment}"
     }
 }
 
-resource "aws_internet_gateway" "default" {
-    vpc_id = "${aws_vpc.default.id}"
+resource "aws_internet_gateway" "terravpc" {
+    vpc_id = "${aws_vpc.terravpc.id}"
 	tags = {
         Name = "${var.IGW_name}"
     }
 }
 
 resource "aws_subnet" "subnet1-public" {
-    vpc_id = "${aws_vpc.default.id}"
+    vpc_id = "${aws_vpc.terravpc.id}"
     cidr_block = "${var.public_subnet1_cidr}"
     availability_zone = "us-east-1a"
 
@@ -43,7 +43,7 @@ resource "aws_subnet" "subnet1-public" {
 }
 
 resource "aws_subnet" "subnet2-public" {
-    vpc_id = "${aws_vpc.default.id}"
+    vpc_id = "${aws_vpc.terravpc.id}"
     cidr_block = "${var.public_subnet2_cidr}"
     availability_zone = "us-east-1b"
 
@@ -53,7 +53,7 @@ resource "aws_subnet" "subnet2-public" {
 }
 
 resource "aws_subnet" "subnet3-public" {
-    vpc_id = "${aws_vpc.default.id}"
+    vpc_id = "${aws_vpc.terravpc.id}"
     cidr_block = "${var.public_subnet3_cidr}"
     availability_zone = "us-east-1c"
 
@@ -65,11 +65,11 @@ resource "aws_subnet" "subnet3-public" {
 
 
 resource "aws_route_table" "terraform-public" {
-    vpc_id = "${aws_vpc.default.id}"
+    vpc_id = "${aws_vpc.terravpc.id}"
 
     route {
         cidr_block = "0.0.0.0/0"
-        gateway_id = "${aws_internet_gateway.default.id}"
+        gateway_id = "${aws_internet_gateway.terravpc.id}"
     }
 
     tags = {
@@ -85,7 +85,7 @@ resource "aws_route_table_association" "terraform-public" {
 resource "aws_security_group" "allow_all" {
   name        = "allow_all"
   description = "Allow all inbound traffic"
-  vpc_id      = "${aws_vpc.default.id}"
+  vpc_id      = "${aws_vpc.terravpc.id}"
 
   ingress {
     from_port   = 0
